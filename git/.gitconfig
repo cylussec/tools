@@ -1,0 +1,29 @@
+[user]
+	name = Brian Seel
+	email = brian.seel@gmail.com
+[push]
+	default = upstream
+[color]
+	status = auto
+	branch = auto
+	ui = true
+[core]
+	excludesfile = ~/.gitignore
+[alias]
+	sts = status
+	lgs = ls-files
+	co = checkout
+	lol = log --graph --decorate --pretty=oneline --abbrev-commit --color
+	lola = log --graph --decorate --pretty=oneline --abbrev-commit --color --all
+	ign = ls-files -o -i --exclude-standard
+	br = branch --vv
+	brs = branch -a -vv
+	sm = submodule
+	df = difftool -t gvimdiff
+	pull-all = pull --ff-only --recurse-submodules=yes
+	clean-all = clean -dfx && submodule foreach git clean -dfx
+	tags = tag -n -l
+	sl = stash list
+	pcb = push origin HEAD
+
+	
