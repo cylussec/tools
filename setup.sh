@@ -16,4 +16,4 @@ cp .vimrc ~
 echo "# Aliases" >> ~/.bashrc
 echo "alias update='sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get -y dist-upgrade'" >> ~/.bashrc
 echo "" >> ~/.bashrc
-echo "eval 'ssh-agent -s'" >> ~/.bashrc
+echo "eval `ssh-agent -s`" >> ~/.bashrc
