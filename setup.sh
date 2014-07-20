@@ -12,10 +12,8 @@ cp .vimrc ~
 #add aliases to bashrc
 echo "# Aliases" >> ~/.bashrc
 echo "alias update='sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get -y dist-upgrade'" >> ~/.bashrc
-echo "" >> ~/.bashrc
-echo "eval `ssh-agent -s`" >> ~/.bashrc
 
 #This sets up the keychain
-/usr/bin/keychain $HOME/.ssh/id_rsa
-source $HOME/.keychain/$HOSTNAME-sh
+echo "/usr/bin/keychain $HOME/.ssh/id_rsa" >> ~/.bashrc
+echo "source $HOME/.keychain/$HOSTNAME-sh" >> ~/.bashrc
 
