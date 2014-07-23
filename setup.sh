@@ -8,6 +8,8 @@ unzip ssh.zip -d ~
 eval `ssh-agent -s`
 ssh-add ~/.ssh/id_rsa
 cp .vimrc ~
+mkdir ~/.spyder2
+cp .spyder.ini ~/.spyder2/
 
 #add aliases to bashrc
 echo "# Aliases" >> ~/.bashrc
