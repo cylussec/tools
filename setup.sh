@@ -13,7 +13,7 @@ cp .spyder.ini ~/.spyder2/
 
 #add aliases to bashrc
 echo "# Aliases" >> ~/.bashrc
-echo "alias update='sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get -y dist-upgrade'" >> ~/.bashrc
+echo "alias update='sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get -y dist-upgrade && sudo apt-get autoremove'" >> ~/.bashrc
 
 #This sets up the keychain
 echo "/usr/bin/keychain $HOME/.ssh/id_rsa" >> ~/.bashrc
