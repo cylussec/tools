@@ -1,15 +1,20 @@
 sudo apt-get update
-sudo apt-get -y upgrade
-sudo apt-get -y dist-upgrade
-sudo apt-get -y install terminator open-vm-tools vim dropbox keychain spyder
+sudo apt-get -y install aptitude
 
-cp git/.* ~
+sudo add-apt-repository ppa:webupd8team/sublime-text-3
+sudo apt-get update
+sudo apt-get install sublime-text-installer
+
+sudo aptitude upgrade
+sudo aptitude dist-upgrade
+sudo aptitude -y install terminator open-vm-tools vim dropbox keychain
+
+cp git/.gitignore ~
+cp git/.gitconfig ~
 unzip ssh.zip -d ~
 eval `ssh-agent -s`
 ssh-add ~/.ssh/id_rsa
 cp .vimrc ~
-mkdir ~/.spyder2
-cp .spyder.ini ~/.spyder2/
 
 #add aliases to bashrc
 echo "# Aliases" >> ~/.bashrc
