@@ -1,0 +1,117 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  config.vm.box = "Ubuntu_14.04_Desktop_x64"
+  config.vm.box_url = "https://www.dropbox.com/s/ao3xp52fyl5lkmo/Ubuntu_14.04_Desktop_x64.box?dl=1"
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  config.vm.synced_folder "../tools", "/vagrant_data"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+  config.vm.provider "virtualbox" do |vb|
+    # Display the VirtualBox GUI when booting the machine
+    vb.gui = true
+  
+    # Customize the amount of memory on the VM:
+    vb.memory = "4096"
+  end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
+  # such as FTP and Heroku are also available. See the documentation at
+  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
+  # config.push.define "atlas" do |push|
+  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
+  # end
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  config.vm.provision "shell", inline: <<-SHELL
+
+    export VHOMEDIR="/home/vagrant"
+    export PG_USER="msf"
+    export PG_DB="msf"
+    export PG_PW="test"
+
+    sudo aptitude update
+    sudo aptitude -y upgrade
+
+    # Add the ruby repos
+    sudo apt-get install software-properties-common
+    sudo apt-add-repository -y ppa:brightbox/ruby-ng
+    sudo apt-get update
+
+    sudo aptitude -y install default-jre build-essential libreadline-dev libssl-dev libpq5 libpq-dev libreadline5 libsqlite3-dev libpcap-dev openjdk-7-jre git-core autoconf postgresql postgresql-client-common postgresql-client pgadmin3 curl zlib1g-dev libxml2-dev libxslt1-dev vncviewer libyaml-dev curl zlib1g-dev git nmap ruby2.1 ruby-switch ruby2.1-dev make sqlite3 libcurl4-openssl-dev python-software-properties libffi-dev
+
+    # Setup Armitage 
+    export ARMITAGE="armitage141120"
+    wget -nv http://www.fastandeasyhacking.com/download/$ARMITAGE.tgz 
+    tar -C $VHOMEDIR -xvf $ARMITAGE.tgz
+
+
+    # Metasploit uses ruby 2.1, so lets default to that
+    sudo ruby-switch --set ruby2.1
+    sudo gem install ffi
+    sudo gem install bundler
+
+    # Postgres for metasploit
+    echo -e "local   all             postgres                                peer\nlocal all all md5\nhost msf msf 127.0.0.1/32 trust" | sudo tee /etc/postgresql/9.3/main/pg_hba.conf
+    sudo -u postgres createuser -D -R -S $PG_USER 
+    sudo -u postgres createdb --owner=$PG_USER $PG_DB
+
+    # Metasploit install
+    yes 1 | sudo $VHOMEDIR/$ARMITAGE/quick-msf-setup
+    echo -e "production:\n adapter: postgresql\n database: msf\n username: msf\n password: test\n host: 127.0.0.1\n port: 5432\n pool: 75\n timeout: 5" | sudo tee /opt/metasploit/apps/pro/ui/config/database.yml
+    sudo chmod 777 /opt/metasploit/apps/pro/ui/config/database.yml
+    echo 'export MSF_DATABASE_CONFIG="$VHOMEDIR/cobaltstrike/database.yml"' >> $VHOMEDIR/.bashrc
+
+    echo 'export PATH="/opt/metasploit-framework:$PATH"' >> $VHOMEDIR/.bashrc
+    echo 'alias cobaltstrike="sudo java -jar $VHOMEDIR/cobaltstrike/cobaltstrike.jar"' >> $VHOMEDIR/.bashrc
+  
+    # Some gems need readable permissions ;)
+    (crontab -l 2>/dev/null; echo "@reboot msfrpcd -U msf -P test -S -a 127.0.0.1 ") | crontab -
+    sudo shutdown -r now
+
+  SHELL
+
+  config.vm.post_up_message = "Now you can run Cobalt Strike with 'cobaltstrike' and Metasploit with 'msfconsole'"
+end

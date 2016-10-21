@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  USERNAME = "vagrant"
+  config.ssh.username = USERNAME
+  config.ssh.password = "vagrant"
+  config.ssh.insert_key = true
+
+  config.vm.box = "Ubuntu_16.04_Desktop_x64"
+  config.vm.box_url = "https://www.dropbox.com/s/u4441m682eqdp0n/Ubuntu_16.04_Desktop_x64-v2.box?dl=1"
+
+  config.vm.synced_folder "D:\\Dropbox\\", "/Dropbox"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = true
+    vb.memory = "1024"
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo add-apt-repository -y ppa:webupd8team/sublime-text-3
+    
+    sudo aptdcon --refresh
+    yes | sudo aptdcon --hide-terminal --upgrade-system
+    yes | sudo aptdcon --hide-terminal --install "aptitude sublime-text-installer vim nautilus-dropbox keychain git"
+
+    git clone https://github.com/cylussec/tools /tmp/tools
+
+    cp /tmp/tools/git/.gitignore /home/#{USERNAME}
+    cp /tmp/tools/git/.gitconfig /home/#{USERNAME}
+    cp /tmp/tools/.vimrc /home/#{USERNAME}
+
+    #add aliases to bashrc
+    echo "# Aliases" >> /home/#{USERNAME}/.bashrc
+    echo "alias update='sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get -y dist-upgrade && sudo apt-get autoremove'" >> /home/#{USERNAME}/.bashrc
+
+    #This sets up the keychain
+    echo "/usr/bin/keychain /home/#{USERNAME}/.ssh/id_rsa" >> /home/#{USERNAME}/.bashrc
+    echo "source /home#{USERNAME}/.keychain/$HOSTNAME-sh" >> /home/#{USERNAME}/.bashrc
+
+    echo "NOTICE"
+    echo "NOTICE"
+    echo "NOTICE: Run the following commands:  unzip /tmp/tools/ssh.zip -d /home/#{USERNAME} && eval `ssh-agent -s` && ssh-add /home/#{USERNAME}/.ssh/id_rsa"
+    echo "NOTICE"
+    echo "NOTICE"
+    echo "NOTICE"
+
+  SHELL
+end
