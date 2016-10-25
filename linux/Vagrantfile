@@ -36,11 +36,11 @@ Vagrant.configure(2) do |config|
 
     #This sets up the keychain
     echo "/usr/bin/keychain /home/#{USERNAME}/.ssh/id_rsa" >> /home/#{USERNAME}/.bashrc
-    echo "source /home#{USERNAME}/.keychain/$HOSTNAME-sh" >> /home/#{USERNAME}/.bashrc
+    echo "source /home/#{USERNAME}/.keychain/$HOSTNAME-sh" >> /home/#{USERNAME}/.bashrc
 
     echo "NOTICE"
     echo "NOTICE"
-    echo "NOTICE: Run the following commands:  unzip /tmp/tools/ssh.zip -d /home/#{USERNAME} && eval `ssh-agent -s` && ssh-add /home/#{USERNAME}/.ssh/id_rsa"
+    echo "NOTICE: Run the following commands:  unzip /tmp/tools/ssh.zip -d /home/#{USERNAME}"
     echo "NOTICE"
     echo "NOTICE"
     echo "NOTICE"
